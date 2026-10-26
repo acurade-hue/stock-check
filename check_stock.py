@@ -4,6 +4,7 @@
   python check_stock.py         재고 확인
   python check_stock.py --test  재고와 상관없이 테스트 알림 발송
 ntfy 채널 이름은 환경변수 NTFY_TOPIC 에서 읽는다.
+환경변수 STOP_AFTER(YYYY-MM-DD, UTC)가 지나면 확인하지 않고 끝난다.
 """
 
 import json
@@ -13,6 +14,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from datetime import date, datetime, timezone
 
 SHOP = "https://shop.lafayetteanticipations.com"
 PRODUCT_URL = f"{SHOP}/en/products/impression-edition-limitee-yu-nishimura"
@@ -65,6 +67,11 @@ def main():
     if "--test" in sys.argv:
         notify("테스트 알림", "알림이 잘 옵니다. 누르면 결제 페이지가 열립니다.")
         print("테스트 알림을 보냈습니다.")
+        return
+
+    stop_after = os.environ.get("STOP_AFTER", "").strip()
+    if stop_after and datetime.now(timezone.utc).date() > date.fromisoformat(stop_after):
+        print(f"감시 기간이 끝났습니다 ({stop_after}까지). Actions에서 Disable workflow를 눌러 주세요.")
         return
 
     if is_available():
