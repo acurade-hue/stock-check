@@ -1,0 +1,25 @@
+name: Stock check
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"   # 10분마다 (UTC 기준, 수 분 지연될 수 있음)
+  workflow_dispatch:          # Actions 탭의 "Run workflow" 버튼
+    inputs:
+      test:
+        description: "테스트 알림 보내기"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check stock
+        env:
+          NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+        run: python3 check_stock.py ${{ inputs.test && '--test' || '' }}
