@@ -22,4 +22,5 @@ jobs:
       - name: Check stock
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          STOP_AFTER: "2026-11-02"   # 이 날짜(UTC)가 지나면 확인하지 않음
         run: python3 check_stock.py ${{ inputs.test && '--test' || '' }}
